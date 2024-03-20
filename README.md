@@ -18,8 +18,8 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 * Configuration
 * Dependencies
 * Database configuration
-* How to run tests
-* Deployment instructions
+* Run tests
+* Deployment 
 
 ### Contribution guidelines ###
 
