@@ -1,0 +1,54 @@
+version: '3.5'
+
+services:
+
+  web:
+    build:
+      context: ../../web
+      dockerfile: Dockerfile
+    image: ntw/web
+    container_name: web
+    hostname: web
+    network_mode: host
+    command: python3 manage.py runserver 0.0.0.0:8000
+
+
+  postgres:
+    build:
+      context: ../../postgres
+      dockerfile: Dockerfile
+    image: ntw/postgres
+    container_name: postgres
+    hostname: postgres
+    network_mode: host
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+
+  services:
+    build:
+      context: ../../services
+      dockerfile: Dockerfile
+    image: ntw/services
+    container_name: services-build
+
+  auth-svc:
+    image: ntw/services
+    container_name: auth-svc
+    hostname: auth-svc
+    network_mode: host
+    command: auth
+    environment:
+      - server.port=8082
+      - database.postgres.host=localhost
+
+
+  spa:
+    build:
+      context: ../../spa
+      dockerfile: Dockerfile
+    image: ntw/spa
+    container_name: spa
+    hostname: spa
+    network_mode: host

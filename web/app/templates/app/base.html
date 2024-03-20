@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products Catalog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/dist/css/bootstrap-theme.min.css">
+    <link rel="shortcut icon" type="image/png" href="/static/images/ntw-logo-icon.png"/>
+</head>
+<body>
+
+    {% load app_tags %}
+    {% include_header %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% include "app/footer.html" %}
+
+</body>

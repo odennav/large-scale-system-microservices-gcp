@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: data
+  labels:
+    app: redis
+spec:
+  clusterIP: None
+  ports:
+    - port: 6379
+      name: default
+  selector:
+    app: redis
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-pod
+  namespace: data
+  labels:
+    app: redis
+spec:
+  containers:
+    - name: prometheus-redis-exporter
+      image: oliver006/redis_exporter
+      ports:
+        - name: prometheus
+          containerPort: 9121
+      env:
+        - name: REDIS_ADDR
+          value: "redis://redis:6379"
+    - name: redis-cont
+      image: redis:latest
+      imagePullPolicy: Always
+      ports:
+        - name: redis
+          protocol: TCP
+          containerPort: 6379
+      livenessProbe:
+        exec:
+          command:
+          - redis-cli
+          - ping
+        initialDelaySeconds: 120	
+      readinessProbe:
+        exec:
+          command:
+          - redis-cli
+          - ping
+        initialDelaySeconds: 30	
+        periodSeconds: 2

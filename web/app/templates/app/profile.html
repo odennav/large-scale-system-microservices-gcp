@@ -1,0 +1,66 @@
+{% extends "app/base.html" %}
+{% block content %}
+
+<style>
+    .profile-section-header {
+        font-size: 1.2em;
+        color: #666;
+        text-align:center;
+        margin: 2em 0 1em 0;
+    }
+</style>
+<div class="container">
+    <div class="page-header">
+        <h1>Profile</h1>
+    </div>
+
+    <ul class="list-group">
+        <li class="list-group-item">Name : {{userProfile.name}}</li>
+        <li class="list-group-item">Id : {{userProfile.id}}</li>
+    </ul>
+
+    <h3 class="profile-section-header">Contact Details</h3>
+    <ul class="list-group">
+        <li class="list-group-item">Name : {{userProfile.contact.name}}</li>
+        <li class="list-group-item">Email : {{userProfile.contact.email}}</li>
+        <li class="list-group-item">Phone : {{userProfile.contact.telephone}}</li>
+    </ul>
+    <h3 class="profile-section-header">Address</h3>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <span>{{userProfile.address.street}}, </span>
+            <span>{{userProfile.address.area}}, </span>
+        </li>
+        <li class="list-group-item">
+            <span>{{userProfile.address.city}}</span>
+        </li>
+        <li class="list-group-item">
+            <span>{{userProfile.address.state}}</span>
+        </li>
+        <li class="list-group-item">
+            <span>{{userProfile.address.country}}</span>
+        </li>
+    </ul>
+    <h3 class="profile-section-header">Shipping Addresses</h3>
+    <div class="row">
+    {% for address in userProfile.shippingAddresses %}
+        <div class="col-md-6">
+            <div class="list-group>">
+                <div class="list-group-item">
+                  <h4>Address {{ forloop.counter }}</h4>
+                  <div>
+                      <p>{{address.street}}</p>
+                      <p>{{address.area}}</p>
+                      <p>{{address.city}}</p>
+                      <p>{{address.state}}</p>
+                      <p>{{address.country}}</p>
+                  </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

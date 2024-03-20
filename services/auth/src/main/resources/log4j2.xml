@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF">
+    <Properties>
+        <Property name="log-path">${env:server.log.path:-./logs/}</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="time=%d{yyy-MM-dd HH:mm:ss.SSS zzz}{GMT+0530} level=%-5level hostname=${sys:hostName}
+ service=AuthSvc threadId=%t class=%logger{36} remotehost=%X{remoteIP} userId=%X{userId} message=%msg%n" />
+        </Console>
+        <RollingFile name="RollingFile" fileName="${log-path}/AuthSvc-${sys:hostName}.log"
+                     filePattern="${log-path}/AuthSvc-${sys:hostName}-%d{yyyy-MM-dd}-%i.log" >
+            <PatternLayout pattern="time=%d{yyy-MM-dd HH:mm:ss.SSS zzz}{GMT+0530} level=%-5level hostname=${sys:hostName}
+ service=AuthSvc threadId=%t class=%logger{36} remotehost=%X{remoteIP} userId=%X{userId} message=%msg%n" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <AsyncLogger name="com.ntw.auth" level="${env:server.log.level:-INFO}" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </AsyncLogger>
+        <AsyncLogger name="com.ntw.oms.user" level="${env:server.log.level:-INFO}" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </AsyncLogger>
+        <AsyncLogger name="com.ntw.common" level="${env:server.log.level:-INFO}" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </AsyncLogger>
+        <AsyncLogger name="com.ntw.auth.WebApplication" level="info" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </AsyncLogger>
+        <AsyncLogger name="com.ntw.common.config" level="info" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </AsyncLogger>
+        <Root level="error">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </Root>
+    </Loggers>
+</configuration>

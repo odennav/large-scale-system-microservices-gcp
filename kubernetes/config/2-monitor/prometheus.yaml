@@ -1,0 +1,59 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: monitor
+  labels:
+    app: prometheus
+spec:
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+      nodePort: 32103
+  selector:
+    app: prometheus
+  type: NodePort
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prometheus-pod
+  namespace: monitor
+  labels:
+    app: prometheus
+spec:
+  containers:
+    - name: prometheus-cont
+      image: prom/prometheus:latest
+      imagePullPolicy: Always
+      ports:
+        - protocol: TCP
+          containerPort: 9090
+      args: ["--config.file=/etc/prometheus/prometheus.yml"]
+      volumeMounts:
+      - name: config-volume-1
+        mountPath: /etc/prometheus/prometheus.yml
+        subPath: prometheus.yml
+      - name: config-volume-2
+        mountPath: /etc/prometheus/rules.yml
+        subPath: rules.yml
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 9090
+        initialDelaySeconds: 120
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 9090
+        initialDelaySeconds: 30
+        periodSeconds: 2
+  volumes:
+    - name: config-volume-1
+      configMap:
+        name: prometheus-config
+    - name: config-volume-2
+      configMap:
+        name: prometheus-config

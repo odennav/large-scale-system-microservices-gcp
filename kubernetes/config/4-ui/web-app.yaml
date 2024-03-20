@@ -1,0 +1,76 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app
+  namespace: ui
+  labels:
+    app: web-app
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 32100
+  selector:
+    app: web-app
+#  type: LoadBalancer
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-pods
+  namespace: ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+       maxUnavailable: 25%
+       maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app-static-cont
+        image: IMAGE_REGISTRY_PATH/lb-web:REVISION_ID
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80      
+        env:
+          - name: WEB_HOSTS
+            value: localhost
+          - name: WEB_PORT
+            value: "8000"
+      - name: web-app-dynamic-cont
+        image: IMAGE_REGISTRY_PATH/web:REVISION_ID
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8000
+        envFrom:
+          - configMapRef:
+              name: web-config
+        livenessProbe:
+          httpGet:
+            path: /status
+            port: 8000
+          initialDelaySeconds: 60
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 2
+        volumeMounts:
+          - name: log-data
+            mountPath: /var/log/oms
+      volumes:
+        - name: log-data
+          emptyDir: {}

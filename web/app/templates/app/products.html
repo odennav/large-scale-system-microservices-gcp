@@ -1,0 +1,27 @@
+{% extends "app/base.html" %}
+{% block content %}
+
+    <div class="container">
+        <!-- --------- Product Grid ----------------------  -->
+        <div class="page-header">
+            <h1>Products</h1>
+        </div>
+        <div class="row">
+            {% for product in products %}
+            <div class="col-12 col-md-4">
+                <div class="thumbnail product-thumbnail">
+                    <a href="{% url 'views.product' %}?id={{product.id}}"><img src="{{product.imageUrl}}" alt="product name">
+                    <div class="product-caption">
+                        <h3>{{product.name}}</h3>
+                        <p id="name">{{product.id}}</p>
+                        <h3>{{product.price}} &#36;</h3>
+                    </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
+

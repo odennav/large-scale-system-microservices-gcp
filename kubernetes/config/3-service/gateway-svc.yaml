@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-svc
+  namespace: service
+  labels:
+    app: gateway-svc
+  annotations:
+    service.kubernetes.io/topology-aware-hints: auto
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    app: gateway-svc
+  type: ClusterIP
+#  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-svc-pods
+  namespace: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gateway-svc
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+       maxUnavailable: 25%
+       maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: gateway-svc
+    spec:
+      containers:
+      - name: gateway-svc-cont
+        image: IMAGE_REGISTRY_PATH/services:REVISION_ID
+        args: ["gateway"]
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+        volumeMounts:
+          - name: log-data
+            mountPath: /var/log/oms
+        envFrom:
+          - configMapRef:
+              name: service-config
+        livenessProbe:
+          httpGet:
+            path: /status
+            port: 8080
+          initialDelaySeconds: 180
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 2
+      volumes:
+        - name: log-data
+          emptyDir: {}
+      topologySpreadConstraints:                                                                                                                     
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: gateway-svc

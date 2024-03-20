@@ -1,0 +1,50 @@
+global:
+  scrape_interval:     15s # Default is every 1 minute.
+  evaluation_interval: 15s # Default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+scrape_configs:
+  - job_name: 'web-app-metrics'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+        - web:8000
+  - job_name: 'services-metrics'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 10s
+    eureka_sd_configs:
+      - server: http://eureka:8761/eureka
+    static_configs:
+      - targets:
+        - eureka:8761
+#        - auth-svc:8080
+#        - product-svc:8080
+#        - order-svc:8080
+#        - inventory-svc:8080
+#        - user-profile-svc:8080
+#        - gateway-svc:8080
+#        - admin-svc:8080
+  - job_name: 'jaeger-metrics'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+        - jaeger-agent:14271
+        - jaeger-collector:14269
+        - jaeger-query:16687
+  - job_name: 'database-metrics'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+        - es-exporter:9114
+        - pg-exporter:9187
+        - cassandra-1:7070
+        - cassandra-2:7070
+        - cassandra-3:7070
+        - rabbitmq:15692
+        - redis-exporter:9121 
+
+rule_files:
+  - rules.yml

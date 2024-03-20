@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-pods
+  namespace: monitor
+  labels:
+    app: fluentd
+spec:
+  selector:
+    matchLabels:
+      app: fluentd
+  template:
+    metadata:
+      labels:
+        app: fluentd
+    spec:
+      initContainers:
+      - name: wait-for-es
+        image: curlimages/curl
+        command: ['sh', '-c', 'until curl http://elasticsearch:9200; do echo Waiting for ES; sleep 2; done;']
+      containers:
+      - name: fluentd-cont
+        image: IMAGE_REGISTRY_PATH/fluentd:REVISION_ID
+        volumeMounts:
+          - name: log-volume
+            mountPath: /var/log
+          - name: config-volume
+            mountPath: /fluentd/etc/fluent.conf
+            subPath: fluent.conf
+        livenessProbe:
+          exec:
+            command:
+            - "/bin/sh"
+            - "-c"
+            - "[[ $( pgrep ruby | wc -l)  == 2 ]]"          
+          initialDelaySeconds: 120
+        readinessProbe:
+          exec:
+            command:
+            - "/bin/sh"
+            - "-c"
+            - "[[ $( pgrep ruby | wc -l)  == 2 ]]"          
+          initialDelaySeconds: 30
+          periodSeconds: 2
+      volumes:
+        - name: log-volume
+          hostPath:
+            path: /var/log
+            type: Directory
+        - name: config-volume
+          configMap:
+            name: fluent-config

@@ -1,0 +1,47 @@
+<link rel="stylesheet" type="text/css" href="/static/css/common.css">
+  
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light p-3">
+  <div class="container-fluid">
+
+    <a class="logo" href="/">
+        <img src="static/images/ntw-logo.png" alt="NewTechWays Logo" />
+    </a>
+    <button class="navbar-toggler" type="button"
+            data-toggle="collapse"
+            data-target="#navbar-data"
+            aria-controls="navbar-data"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon" style="color:#000"></span>
+    </button>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="navbar-data">
+      <ul class="nav navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="data">Data</a></li>
+        <li class="nav-item"><a class="nav-link" href="monitor">Monitoring</a></li>
+      </ul>
+      <ul class="nav navbar-nav mx-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+             aria-haspopup="true" aria-expanded="false">
+              {% if user_name %}
+              <span>{{user_name}} </span>
+              {% else %}
+              <span>You </span>
+              {% endif %}
+              <span class="caret"></span>
+          </a>
+          <div class="dropdown-menu">
+              {% if user_name %}
+              <a class="dropdown-item" href="/logout">Sign Out</a>
+              <a class="dropdown-item" href="/profile">Profile</a>
+              {% else %}
+              <a class="dropdown-item" href="/loginForm">Sign In</a>
+              {% endif %}
+          </div>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>

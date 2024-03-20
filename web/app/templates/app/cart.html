@@ -1,0 +1,37 @@
+{% extends "app/base.html" %}
+{% block content %}
+
+    <div class="container">
+        <!-- --------- Product Grid ----------------------  -->
+        <div class="page-header">
+            <h1>Cart</h1>
+        </div>
+        <div class="row">
+            {% if cart.cartLines %}
+                {% for cartLine in cart.cartLines %}
+                <div class="col-sm-6 col-md-4">
+                    <div class="thumbnail product-thumbnail">
+                        <a href="{% url 'views.product' %}?id={{cartLine.product.id}}">
+                            <img src="{{cartLine.product.imageUrl}}" alt="product name"></a>
+                        <div class="product-caption">
+                            <h3 id="name">Product: {{cartLine.product.name}}</h3>
+                            <p>Qty: {{cartLine.quantity}}</p>
+                            <h3>Price: {{cartLine.product.price}} &#36;</h3>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="col-12">
+                    <a class="btn btn-primary" href="/createOrder">Create Order</a>
+                </div>
+            {% else %}
+                <div>
+                    <h1>Your cart is empty!</h1>
+                    <a href="/products" class="btn btn-info" style="margin:1em" >Products</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
+

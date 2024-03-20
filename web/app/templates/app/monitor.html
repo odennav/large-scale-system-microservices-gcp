@@ -1,0 +1,82 @@
+{% extends "app/base.html" %}
+{% block content %}
+
+<script>
+    function open_monitoring() {
+        window.open(window.location.protocol+'//'+window.location.hostname+':{{ ports.prometheus }}','_blank');
+    };
+
+    function open_tracing() {
+        window.open(window.location.protocol+'//'+window.location.hostname+':{{ ports.jaeger }}','_blank');
+    };
+
+    function open_logging() {
+        window.open(window.location.protocol+'//'+window.location.hostname+':{{ ports.kibana }}','_blank');
+    };
+
+    function open_rabbitmq() {
+        window.open(window.location.protocol+'//'+window.location.hostname+':{{ ports.rabbitmq }}','_blank');
+    };
+</script>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Monitoring Dashboard</h1>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-3">
+
+            <div>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="/systemStatus?layer=services">Ping Services</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/systemStatus?layer=databases">Ping Databases</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/systemStatus?layer=web">Ping Web</a>
+                    </li>
+                </ul>
+            </div>
+            <div style="margin:1em 0">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="/registry">Registry Status</a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a style="cursor:pointer" onclick="open_monitoring();return false;">Monitoring - Prometheus</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a style="cursor:pointer" onclick="open_tracing();return false;">Tracing - Jaeger</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a style="cursor:pointer" onclick="open_logging();return false;">Logging - Kibana</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a style="cursor:pointer" onclick="open_rabbitmq();return false;">Message Queue</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="col-md-9 well">
+            <div>
+                {% if message %}
+                {{message|safe}}
+                {% endif %}
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+{% endblock %}

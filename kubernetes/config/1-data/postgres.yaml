@@ -1,0 +1,90 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: data
+  labels:
+    app: postgres
+spec:
+  clusterIP: None
+  ports:
+    - port: 5432
+      name: postgres
+    - port: 9187
+      name: prometheus
+  selector:
+    app: postgres
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres-pod
+  namespace: data
+  labels:
+    app: postgres
+spec:
+  containers:
+    - name: prometheus-pg-exporter
+      image: prometheuscommunity/postgres-exporter
+      ports:
+        - name: prometheus
+          containerPort: 9187
+      env:
+        - name: DATA_SOURCE_NAME
+          value: "postgresql://postgres:postgres@postgres:5432/oms?sslmode=disable"
+      
+    - name: postgres-cont
+      image: IMAGE_REGISTRY_PATH/postgres:REVISION_ID
+      imagePullPolicy: Always
+      ports:
+        - protocol: TCP
+          containerPort: 5432
+      volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: postgres-storage
+          subPath: postgres
+      livenessProbe:
+        exec:
+           command:
+           - /bin/bash
+           - -c
+           - /check-readiness.sh
+        initialDelaySeconds: 120
+      readinessProbe:
+        exec:
+           command:
+           - /bin/bash
+           - -c
+           - /check-readiness.sh
+        initialDelaySeconds: 30
+        periodSeconds: 5
+      env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: secret-config
+              key: postgres.user
+      env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-config
+              key: postgres.password
+  volumes:
+    - name: postgres-storage
+      persistentVolumeClaim:
+        claimName: local-disk-postgres-claim
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: local-disk-postgres-claim
+  namespace: data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

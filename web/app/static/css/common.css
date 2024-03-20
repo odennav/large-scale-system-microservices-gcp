@@ -1,0 +1,176 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Mar 29, 2017, 10:51:36 PM
+    Author     : anurag
+*/
+
+
+/* ----- Header CSS ----- */
+
+.navbar {
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 1px 4px 0 rgba(0, 0, 0, 0.19);
+    opacity: 1;
+}
+.navbar-nav > li {
+    text-align:center;
+}
+.navbar-nav > li > a {
+    background: none;
+    color: #666 !important;
+    font-size: 1.2em;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-weight: 400;
+}
+.nav > li > a {
+	padding: 0 2em !important;
+}
+.navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
+	color: white;
+}
+.navbar-nav > li > a:hover, .navbar-nav > li > a:focus {
+    color: white;
+	background: none;
+    text-decoration: none;
+}
+.navbar-toggler {
+    border: 1px solid #666 !important;
+}
+.dropdown-menu {
+    background-color: #fff;
+}
+.dropdown-item {
+    color: #666;
+    text-align: center;
+}
+.dropdown-item:hover {
+    color: #000;
+    background-color: #eee;
+}
+nav a:hover,
+nav a:focus {
+	outline: none;
+}
+
+
+.navbar-brand {
+    padding:0px 10px;
+}
+.navbar-brand img {
+    height:50px;
+    padding: 10px;
+}
+
+
+.logo {
+	float:left;
+	text-align:center;
+}
+.logo img {
+    max-height:40px;
+    width: auto;
+    padding: 4px 7px 3px 7px;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.page-header {
+    text-align:center;
+    margin-top: 5em;
+    padding: 1em;
+}
+.page-header h1 {
+    font-size: 1.5em;
+    text-align: center;
+    color: #666;
+}
+
+/*This setting affects ipad - 768px */
+@media screen and (max-width: 800px) {
+	.navbar-nav > li a {
+		margin: 1em 0;
+	}
+}
+@media screen and (max-width: 640px) {
+	.navbar-nav > li a {
+		margin: .75em 0;
+	}
+}
+
+
+/* ----- Home CSS ----- */
+
+.list-group-item a {
+  color: #666 !important;
+  text-decoration: none;
+}
+
+/* ----- Login CSS ----- */
+
+.login input {
+    margin: 10px 5px;
+}
+
+
+/* ----- Product CSS ----- */
+
+.product-image-large img {
+    width: auto;
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
+}
+.product-thumbnail {
+    height:26em;
+    border: 1px solid #ccc;
+    margin-bottom: 2em;
+    text-align: center;
+}
+.product-thumbnail a {
+    text-decoration: none
+}
+.product-thumbnail a img {
+    padding-top: 1em;
+    max-height: 18em;
+}
+.product-caption {
+    text-align: left;
+    padding: 1em;
+    color: black;
+}
+.product-caption h3 {
+    font-size: 1.2em;
+    text-transform: capitalize;
+}
+.product-caption p {
+    font-size: 1em;
+}
+
+
+/* ----- Order CSS ----- */
+
+.order-id {
+    font-size:1.2em;
+}
+.order-id a {
+    color: #666;
+    text-decoration: none;
+}
+
+
+/* ----- Data & Monitor CSS ----- */
+
+.well {
+    padding:1em;
+}
+@media screen and (max-width: 800px) {
+    .well {
+        margin: 1em;
+        min-height: 10em;
+    }
+}

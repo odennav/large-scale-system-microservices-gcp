@@ -1,0 +1,29 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jmeter
+  namespace: test
+spec:
+  template:
+    spec:
+      containers:
+      - name: jmeter
+        image: IMAGE_REGISTRY_PATH/jmeter:REVISION_ID
+#        command: ["/usr/bin/jmeter","-n","-t","/usr/data/jmeter/test-plan.jmx","-Jusers=10","-Jcount=100","-LERROR","-DREST_HOST=gateway-svc","-DREST_PORT=80"]
+        env:
+          - name: TEST_HOST
+            value: gateway-svc.service
+          - name: TEST_PORT
+            value: "80"
+          - name: USER_NUM
+            value: "20"
+          - name: LOOP_NUM
+            value: "20"
+          - name: LOG_LEVEL
+            value: ERROR
+          - name: LOG_LEVEL_HTTP
+            value: INFO
+        imagePullPolicy: Always
+      restartPolicy: Never
+  backoffLimit: 4

@@ -1,0 +1,62 @@
+{% extends "app/base.html" %}
+{% block content %}
+
+<style>
+  pre {
+      white-space: pre-wrap;
+  }
+  </style>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Data Dashboard</h1>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-3">
+
+            <div>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="/deleteTestData">Delete All Data</a>
+                    </li>
+                    <li class="list-group-item">
+                        <form action="/createTestData" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label>User Count:</label>
+                                <input type="number" class="form-control" name="userCount" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label>Product Count:</label>
+                                <input type="number" class="form-control" name="productCount" value="10">
+                            </div>
+                            <button class="btn btn-primary" type="submit" class="btn btn-default">Create Data</button>
+                        </form>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/tableData?table=auth">User Auth Data</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/tableData?table=product">Product Data</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/tableData?table=inventory">Inventory Data</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/tableData?table=order">Order Data</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-9 well">
+            <div>{{message|safe}}</div>
+        </div>
+
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,430 @@
+version: '3.5'
+
+networks:
+  mynet1:
+    name: mynet1
+
+volumes:
+  elasticsearch-data:
+    driver: local
+  fluentd-logs:
+    driver: local
+  postgres-data:
+    driver: local
+  postgres-logs:
+    driver: local
+  app-logs:
+    driver: local
+
+
+services:
+
+  fluentd:
+    build:
+      context: ../../fluentd
+      dockerfile: Dockerfile
+    image: ntw/fluentd
+    container_name: fluentd
+    hostname: fluentd
+    networks:
+      - mynet1
+    ports:
+      - "24224:24224"
+    volumes:
+      - ${PWD}/fluent.conf:/fluentd/etc/fluent.conf
+      - fluentd-logs:/fluentd/log
+    depends_on:
+      - "elasticsearch"
+    restart: unless-stopped
+
+  
+  elasticsearch:
+    image: elasticsearch:7.13.2
+    container_name: elasticsearch
+    hostname: elasticsearch
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "xpack.security.enabled=false"
+    expose:
+      - "9200"
+    ports:
+      - "9200:9200"
+    networks:
+      - mynet1
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    
+
+  kibana:
+    image: kibana:7.13.2
+    container_name: kibana
+    hostname: kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - mynet1
+    environment:
+      - ELASTICSEARCH_HOSTS="http://elasticsearch:9200"
+    restart: unless-stopped
+    depends_on:
+      - "elasticsearch"
+      
+
+  jaeger-agent:
+    image: jaegertracing/jaeger-agent
+    container_name: jaeger-agent
+    hostname: jaegar-agent
+    networks:
+      - mynet1
+    ports:
+      - "6831:6831/udp"
+      - "14271:14271"
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+    command: ["--reporter.grpc.host-port=jaeger-collector:14250"]
+    restart: unless-stopped
+    depends_on:
+      - "jaeger-collector"
+
+  jaeger-collector:
+    image: jaegertracing/jaeger-collector
+    container_name: jaeger-collector
+    hostname: jaegar-collector
+    networks:
+      - mynet1
+    ports:
+      - "14250:14250"
+      - "14269:14269"
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+#      - ES_SERVER_URLS="elasticsearch:9200"
+    command: [
+      "--es.server-urls=http://elasticsearch:9200",
+      "--es.num-shards=1",
+      "--es.num-replicas=0",
+      "--log-level=error"
+    ]
+    restart: unless-stopped
+    
+  jaeger-query:
+    image: jaegertracing/jaeger-query
+    container_name: jaeger-query
+    hostname: jaeger-query
+    networks:
+      - mynet1
+    ports:
+      - "16685:16685"
+      - "16686:16686"
+      - "16687:16687"
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+    command: [
+      "--es.server-urls=http://elasticsearch:9200",
+      "--span-storage.type=elasticsearch",
+      "--log-level=debug"
+    ]
+    restart: unless-stopped
+    depends_on:
+      - "jaeger-collector"
+
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    hostname: prometheus
+    networks:
+      - mynet1
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    volumes:
+      - ${PWD}/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ${PWD}/rules.yml:/etc/prometheus/rules.yml
+    restart: unless-stopped
+
+  es-exporter:
+    image: prometheuscommunity/elasticsearch-exporter
+    container_name: es-exporter
+    hostname: es-exporter
+    networks:
+      - mynet1
+    ports:
+      - "9114:9114"
+    command:
+      - '--es.uri=http://elasticsearch:9200'
+    restart: unless-stopped
+
+  pg-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: pg-exporter
+    hostname: pg-exporter
+    networks:
+      - mynet1
+    ports:
+      - "9187:9187"
+    environment:
+      - DATA_SOURCE_NAME=postgresql://postgres:postgres@postgres:5432/oms?sslmode=disable
+    restart: unless-stopped
+
+    
+  
+  lb-web:
+    build:
+      context: ../../lb-web
+      dockerfile: Dockerfile
+    image: ntw/lb-web
+    container_name: lb-web
+    networks:
+      - mynet1
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - SERVER_HOSTS=web
+      - SERVER_PORT=8000
+      - USE_SSL=false
+    volumes:
+      - app-logs:/var/log/oms
+    depends_on:
+      - "web"
+
+  lb-services:
+    build:
+      context: ../../lb-services
+      dockerfile: Dockerfile
+    image: ntw/lb-services
+    container_name: lb-services
+    networks:
+      - mynet1
+    ports:
+      - "81:80"
+    environment:
+      - SERVER_HOSTS=gateway-svc
+      - SERVER_PORT=8080
+    volumes:
+      - app-logs:/var/log/oms
+    depends_on:
+      - "gateway-svc"
+
+    
+  web:
+    build:
+      context: ../../web
+      dockerfile: Dockerfile
+    image: ntw/web
+    container_name: web
+    hostname: web
+    networks:
+      - mynet1
+    ports:
+      - "8000:8000"
+    command: python3 manage.py runserver 0.0.0.0:8000
+    env_file: .env
+    volumes:
+      - app-logs:/var/log/oms
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "127.0.0.1:24224"
+        tag: web
+    depends_on:
+      - "fluentd"
+
+      
+  services:
+    build:
+      context: ../../services
+      dockerfile: Dockerfile
+    image: ntw/services
+    container_name: services-build
+
+  eureka:
+    build:
+      context: ../../eureka
+      dockerfile: Dockerfile
+    image: ntw/eureka
+    container_name: eureka
+    hostname: eureka
+    networks:
+      - mynet1
+    ports:
+      - "8761:8761"
+    env_file: .env
+    environment:
+      - JAVA_OPTIONS=-Xmx512M
+      - server.port=8761
+      - eureka.client.registerWithEureka=false
+      - eureka.client.fetchRegistry=false
+    volumes:
+      - app-logs:/usr/local/tomcat/logs
+
+  gateway-svc:
+    image: ntw/services
+    container_name: gateway-svc
+    hostname: gateway-svc
+    networks:
+      - mynet1
+    ports:
+      - "8080:8080"
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=gateway-svc
+    volumes:
+      - app-logs:/var/log/oms
+    command: gateway
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "127.0.0.1:24224"
+        tag: gateway-svc
+    depends_on:
+      - "fluentd"
+
+
+  admin-svc:
+    image: ntw/services
+    container_name: admin-svc
+    hostname: admin-svc
+    networks:
+      - mynet1
+    ports:
+      - "8081:8080"
+    command: admin
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=admin-svc
+    volumes:
+      - app-logs:/var/log/oms
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "127.0.0.1:24224"
+        tag: gateway-svc
+    depends_on:
+      - "fluentd"
+
+  auth-svc:
+    image: ntw/services
+    container_name: auth-svc
+    hostname: auth-svc
+    networks:
+      - mynet1
+    ports:
+      - "8082:8080"
+    command: auth
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=auth-svc
+    volumes:
+      - app-logs:/var/log/oms
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "127.0.0.1:24224"
+        tag: gateway-svc
+    depends_on:
+      - "fluentd"
+
+  product-svc:
+    image: ntw/services
+    container_name: product-svc
+    hostname: product-svc
+    networks:
+      - mynet1
+    ports:
+      - "8083:8080"
+    command: product
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=product-svc
+    volumes:
+      - app-logs:/var/log/oms
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "127.0.0.1:24224"
+        tag: gateway-svc
+    depends_on:
+      - "fluentd"
+
+  order-svc:
+    image: ntw/services
+    container_name: order-svc
+    hostname: order-svc
+    networks:
+      - mynet1
+    ports:
+      - "8084:8080"
+    command: order
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=order-svc
+    volumes:
+      - app-logs:/var/log/oms
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "127.0.0.1:24224"
+        tag: gateway-svc
+    depends_on:
+      - "fluentd"
+
+  inventory-svc:
+    image: ntw/services
+    container_name: inventory-svc
+    hostname: inventory-svc
+    networks:
+      - mynet1
+    ports:
+      - "8085:8080"
+    command: inventory
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=inventory-svc
+    volumes:
+      - app-logs:/var/log/oms
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "127.0.0.1:24224"
+        tag: gateway-svc
+    depends_on:
+      - "fluentd"
+
+
+
+  spa:
+    build:
+      context: ../../spa
+      dockerfile: Dockerfile
+    image: ntw/spa
+    container_name: spa
+    hostname: spa
+    networks:
+      - mynet1
+    ports:
+      - "3000:80"
+
+
+  postgres:
+    build:
+      context: ../../postgres
+      dockerfile: Dockerfile
+    image: ntw/postgres
+    container_name: postgres
+    hostname: postgres
+    networks:
+      - mynet1
+    ports:
+      - "54321:5432"
+    env_file: .env
+    volumes:
+      - postgres-logs:/var/log/postgresql
+      - postgres-data:/var/lib/postgresql/data
+
+
+      
+

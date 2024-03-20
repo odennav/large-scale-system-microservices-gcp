@@ -1,0 +1,240 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-config
+  namespace: service
+  labels:
+    app: services
+data:
+  server.port: "8080"
+  server.threadPool.threads.minimum: "5"
+  server.threadPool.threads.maximum: "15"
+  eureka.client.registerWithEureka: "false"
+  eureka.client.fetchRegistry: "false"
+  ribbon.eureka.enabled: "false"
+  GatewaySvc.ribbon.listOfServers: "http://gateway-svc:80"
+  AdminSvc.ribbon.listOfServers: "http://admin-svc:80"
+  AuthSvc.ribbon.listOfServers: "http://auth-svc:80"
+  ProductSvc.ribbon.listOfServers: "http://product-svc:80"
+  OrderSvc.ribbon.listOfServers: "http://order-svc:80"
+  InventorySvc.ribbon.listOfServers: "http://inventory-svc:80"
+  database.cassandra.hosts: "cassandra.data"
+  database.cassandra.port: "9042"
+  database.cassandra.keySpace: "oms"
+  database.postgres.host: "postgres.data"
+  database.postgres.port: "5432"
+  database.postgres.schema: "oms"
+  opentracing.jaeger.enabled: "true"
+  opentracing.jaeger.udp-sender.host: "jaeger-agent.monitor"
+  opentracing.jaeger.udp-sender.port: "6831"
+  server.log.path: "/var/log/oms"
+  server.log.level: "INFO"
+  JAVA_HEAP_MEMORY: "-Xms256M -Xmx512M"
+  order.process.async: "true"
+  order.queue.type: "rabbitmq"
+  order.queue.host: "rabbitmq.data"
+  order.queue.name: "order-queue"
+  redis.enabled: "true"
+  redis.hostname: "redis.data"
+  redis.port: "6379"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+  namespace: ui
+  labels:
+    app: web
+data:
+  SERVICES_HOST: "gateway-svc.service"
+  SERVICES_PORT: "80"
+  PYUI_LOG_FILE: "/var/log/oms/PyUi.log"
+  REGISTRY_URL: "#"
+  DJANGO_DEBUG: "False"
+  PROMETHEUS_PORT: "32103"
+  JAEGER_PORT: "32102"
+  KIBANA_PORT: "32101"
+  RABBITMQ_PORT: "32104"
+  JAEGER_AGENT_HOST: "jaeger-agent.monitor"
+  JAEGER_AGENT_PORT: "6831"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-config
+  namespace: data
+  labels:
+    app: cassandra
+data:
+  CASSANDRA_SEEDS: "cassandra-pods-0.cassandra.data.svc.cluster.local"
+  SCHEMA_SEED_INSTANCE: "cassandra-pods-0"
+  REPLICATION_FACTOR: "3"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-config
+  namespace: monitor
+  labels:
+    app: fluentd
+data:
+  fluent.conf: |
+    <source>
+      @type tail
+      path /var/log/containers/*.log
+      pos_file /var/log/fluentd-containers.log.pos
+      tag kubernetes.*
+      format none
+      read_from_head true
+    </source>
+    
+    
+    <match kubernetes.var.log.containers.**-svc-pods-**>
+      @type rewrite_tag_filter
+      <rule>
+        key message
+        pattern /time=\d{4}-\d{2}-\d{2}/
+        tag logger.${tag}
+      </rule>
+      <rule>
+        key message
+        pattern /^(?!time=\d{4}-\d{2}-\d{2}).*$/
+        tag unknown..${tag}
+      </rule>
+    </match>
+    <match kubernetes.var.log.containers.**-app-pods-**>
+      @type rewrite_tag_filter
+      <rule>
+        key message
+        pattern /time=\d{4}-\d{2}-\d{2}/
+        tag logger.${tag}
+      </rule>
+      <rule>
+        key message
+        pattern /^(?!time=\d{4}-\d{2}-\d{2}).*$/
+        tag unknown..${tag}
+      </rule>
+    </match>
+    
+    <match fluent.**>
+      @type null
+    </match>
+    <match kubernetes.**>
+      @type null
+    </match>
+    
+    
+    <filter logger.**>
+      @type record_transformer
+      enable_ruby
+      <record>
+        time ${record["message"][/time=\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3}/].sub("time=","")}
+        level ${record["message"][/level=[A-Z]*\s/].sub("level=","")}
+        hostname ${record["message"][/hostname=[A-Za-z0-9\-]*\s/].sub("hostname=","")}
+        service ${record["message"][/service=[A-Za-z0-9\-]*\s/].sub("service=","")}
+        message ${record["message"].sub(/^.*\smessage=/,"")}
+        logsrc app-logger
+      </record>
+    </filter>
+    
+    <filter unknown.**>
+      @type record_transformer
+      enable_ruby
+      <record>
+        message ${record["message"]}
+        logsrc app-unknown
+      </record>
+    </filter>
+    
+    <match **>
+      @type copy
+      <store>
+        @type elasticsearch
+        host elasticsearch
+        port 9200
+        logstash_format true
+        logstash_prefix fluentd
+        logstash_dateformat %Y%m%d
+        include_tag_key true
+        type_name access_log
+        tag_key @log_name
+        flush_interval 1s
+      </store>
+      <store>
+        @type stdout
+      </store>
+    </match>
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitor
+  labels:
+    app: prometheus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval:     15s # Default is every 1 minute.
+      evaluation_interval: 15s # Default is every 1 minute.
+      # scrape_timeout is set to the global default (10s).
+    scrape_configs:
+      - job_name: 'services-metrics'
+        metrics_path: '/actuator/prometheus'
+        scrape_interval: 5s
+        static_configs:
+          - targets:
+            - auth-svc.service:80
+            - product-svc.service:80
+            - order-svc.service:80
+            - inventory-svc.service:80
+            - gateway-svc.service:80
+            - admin-svc.service:80
+      - job_name: 'jaeger-metrics'
+        metrics_path: '/metrics'
+        scrape_interval: 5s
+        static_configs:
+          - targets:
+            - jaeger-agent:14271
+            - jaeger-collector:14269
+            - jaeger-query:16687
+      - job_name: 'database-metrics'
+        metrics_path: '/metrics'
+        scrape_interval: 5s
+        static_configs:
+          - targets:
+            - elasticsearch:9114
+            - postgres.data:9187
+            - cassandra.data:7070
+            - rabbitmq.data:15692
+            - redis.data:9121 
+    rule_files:
+      - rules.yml
+  rules.yml: |
+    groups:
+    - name: example
+      rules:
+    
+      # Alert for any instance that is unreachable for >5 minutes.
+      - alert: InstanceDown
+        expr: up == 0
+        for: 5s
+        labels:
+          severity: page
+        annotations:
+          summary: "Instance {{ $labels.instance }} down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 seconds."
+    
+      # Alert for any instance that has a median request latency >1s.
+      - alert: APIHighRequestLatency
+        expr: api_http_request_latencies_second{quantile="0.5"} > 0.1
+        for: 10m
+        annotations:
+          summary: "High request latency on {{ $labels.instance }}"
+          description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
+    

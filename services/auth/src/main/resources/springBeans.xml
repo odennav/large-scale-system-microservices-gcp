@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:ldap="http://www.springframework.org/schema/ldap"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/ldap
+                           http://www.springframework.org/schema/ldap/spring-ldap.xsd">
+
+    <ldap:context-source
+            url="ldap://ldap:389"
+            base="dc=newtechways,dc=com"
+            username="cn=Manager,dc=newtechways,dc=com"
+            password="secret" />
+
+    <ldap:ldap-template id="ldapTemplate" />
+
+</beans>

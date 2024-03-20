@@ -1,0 +1,280 @@
+version: '3.5'
+
+networks:
+  mynet1:
+    name: mynet1
+
+volumes:
+  postgres-data:
+    driver: local
+  postgres-logs:
+    driver: local
+  app-logs:
+    driver: local
+
+
+services:
+
+  lb-web:
+    build:
+      context: ../../lb-web
+      dockerfile: Dockerfile
+    image: ntw/lb-web
+    container_name: lb-web
+    networks:
+      - mynet1
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - SERVER_HOSTS=web-1,web-2
+      - SERVER_PORT=8000
+      - USE_SSL=false
+    volumes:
+      - app-logs:/var/log/oms
+
+  lb-services:
+    build:
+      context: ../../lb-services
+      dockerfile: Dockerfile
+    image: ntw/lb-services
+    container_name: lb-services
+    networks:
+      - mynet1
+    ports:
+      - "81:80"
+    environment:
+      - SERVER_HOSTS=gateway-svc-1,gateway-svc-2
+      - SERVER_PORT=8080
+    volumes:
+      - app-logs:/var/log/oms
+
+    
+  web-1:
+    build:
+      context: ../../web
+      dockerfile: Dockerfile
+    image: ntw/web
+    container_name: web-1
+    hostname: web-1
+    networks:
+      - mynet1
+    ports:
+      - "8000:8000"
+    command: python3 manage.py runserver 0.0.0.0:8000
+    env_file: .env
+    volumes:
+      - app-logs:/var/log/oms
+
+  web-2:
+    build:
+      context: ../../web
+      dockerfile: Dockerfile
+    image: ntw/web
+    container_name: web-2
+    hostname: web-2
+    networks:
+      - mynet1
+    ports:
+      - "8001:8000"
+    command: python3 manage.py runserver 0.0.0.0:8000
+    env_file: .env
+    volumes:
+      - app-logs:/var/log/oms
+
+      
+  services:
+    build:
+      context: ../../services
+      dockerfile: Dockerfile
+    image: ntw/services
+    container_name: services-build
+
+  eureka:
+    build:
+      context: ../../eureka
+      dockerfile: Dockerfile
+    image: ntw/eureka
+    container_name: eureka
+    hostname: eureka
+    networks:
+      - mynet1
+    ports:
+      - "8761:8761"
+    env_file: .env
+    environment:
+      - JAVA_OPTIONS=-Xmx512M
+      - server.port=8761
+      - eureka.client.registerWithEureka=false
+      - eureka.client.fetchRegistry=false
+    volumes:
+      - app-logs:/usr/local/tomcat/logs
+
+  gateway-svc-1:
+    image: ntw/services
+    container_name: gateway-svc-1
+    hostname: gateway-svc-1
+    networks:
+      - mynet1
+    ports:
+      - "8080:8080"
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=gateway-svc-1
+    volumes:
+      - app-logs:/var/log/oms
+    command: gateway
+
+  gateway-svc-2:
+    image: ntw/services
+    container_name: gateway-svc-2
+    hostname: gateway-svc-2
+    networks:
+      - mynet1
+    ports:
+      - "8090:8080"
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=gateway-svc-2
+    volumes:
+      - app-logs:/var/log/oms
+    command: gateway
+
+  admin-svc:
+    image: ntw/services
+    container_name: admin-svc
+    hostname: admin-svc
+    networks:
+      - mynet1
+    ports:
+      - "8081:8080"
+    command: admin
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=admin-svc
+    volumes:
+      - app-logs:/var/log/oms
+
+  auth-svc:
+    image: ntw/services
+    container_name: auth-svc
+    hostname: auth-svc
+    networks:
+      - mynet1
+    ports:
+      - "8082:8080"
+    command: auth
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=auth-svc
+    volumes:
+      - app-logs:/var/log/oms
+
+  product-svc-1:
+    image: ntw/services
+    container_name: product-svc-1
+    hostname: product-svc-1
+    networks:
+      - mynet1
+    ports:
+      - "8083:8080"
+    command: product
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=product-svc-1
+    volumes:
+      - app-logs:/var/log/oms
+
+  product-svc-2:
+    image: ntw/services
+    container_name: product-svc-2
+    hostname: product-svc-2
+    networks:
+      - mynet1
+    ports:
+      - "8093:8080"
+    command: product
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=product-svc-2
+    volumes:
+      - app-logs:/var/log/oms
+      
+  order-svc:
+    image: ntw/services
+    container_name: order-svc
+    hostname: order-svc
+    networks:
+      - mynet1
+    ports:
+      - "8084:8080"
+    command: order
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=order-svc
+    volumes:
+      - app-logs:/var/log/oms
+
+  inventory-svc-1:
+    image: ntw/services
+    container_name: inventory-svc-1
+    hostname: inventory-svc-1
+    networks:
+      - mynet1
+    ports:
+      - "8085:8080"
+    command: inventory
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=inventory-svc-1
+    volumes:
+      - app-logs:/var/log/oms
+
+  inventory-svc-2:
+    image: ntw/services
+    container_name: inventory-svc-2
+    hostname: inventory-svc-2
+    networks:
+      - mynet1
+    ports:
+      - "8095:8080"
+    command: inventory
+    env_file: .env
+    environment:
+      - eureka.instance.hostname=inventory-svc-2
+    volumes:
+      - app-logs:/var/log/oms
+
+
+  spa:
+    build:
+      context: ../../spa
+      dockerfile: Dockerfile
+    image: ntw/spa
+    container_name: spa
+    hostname: spa
+    networks:
+      - mynet1
+    ports:
+      - "3000:80"
+
+
+  postgres:
+    build:
+      context: ../../postgres
+      dockerfile: Dockerfile
+    image: ntw/postgres
+    container_name: postgres
+    hostname: postgres
+    networks:
+      - mynet1
+    ports:
+      - "54321:5432"
+    env_file: .env
+    volumes:
+      - postgres-logs:/var/log/postgresql
+      - postgres-data:/var/lib/postgresql/data
+
+
+      
+

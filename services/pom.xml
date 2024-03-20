@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                              http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ntw</groupId>
+    <artifactId>oms</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0</version>
+    <name>Order Management Application Project</name>
+
+    <properties>
+      <install.dir>${env.HOME}/Programs/jetty-9.4.18</install.dir>
+    </properties>
+    
+    <modules>
+      <module>common</module>
+      <module>admin</module>
+      <module>auth</module>
+      <module>gateway</module>
+      <module>product</module>
+      <module>order</module>
+      <module>inventory</module>
+	  <module>discovery</module>
+  </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+	    </plugins>
+        </pluginManagement>
+	<plugins>
+	  <plugin>
+	    <artifactId>maven-antrun-plugin</artifactId>
+	    <executions>
+	      <execution>
+		<id>copy_package</id>
+		<phase>package</phase>
+		<goals>
+		  <goal>run</goal>
+		</goals>
+		<configuration>
+		  <tasks>
+            <copy file="admin/target/admin.war" todir="target/"/>
+		    <copy file="auth/target/auth.war" todir="target/"/>
+		    <copy file="gateway/target/gateway.war" todir="target/"/>
+		    <copy file="product/target/product.war" todir="target/"/>
+		    <copy file="order/target/order.war" todir="target/"/>
+            <copy file="inventory/target/inventory.war" todir="target/"/>
+			<copy file="discovery/target/discovery.jar" todir="target/"/>
+		  </tasks>
+		</configuration>
+	      </execution>
+	      <execution>
+		<id>copy_install</id>
+		<phase>install</phase>
+		<goals>
+		  <goal>run</goal>
+		</goals>
+		<configuration>
+		  <tasks>
+            <copy file="admin/target/admin.war" todir="${install.dir}/webapps/"/>
+		    <copy file="auth/target/auth.war" todir="${install.dir}/webapps/"/>
+		    <copy file="gateway/target/gateway.war" todir="${install.dir}/webapps/"/>
+		    <copy file="product/target/product.war" todir="${install.dir}/webapps/"/>
+		    <copy file="order/target/order.war" todir="${install.dir}/webapps/"/>
+            <copy file="inventory/target/inventory.war" todir="${install.dir}/webapps/"/>
+			<copy file="discovery/target/discovery.jar" todir="${install.dir}/webapps/"/>
+		  </tasks>
+		</configuration>
+	      </execution>
+	    </executions>
+	  </plugin>
+	</plugins>
+    </build>
+    
+</project>

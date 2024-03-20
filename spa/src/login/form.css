@@ -1,0 +1,8 @@
+.login h3 {
+	font-size: 1em;
+	margin: 2em 0;
+	color: #666;
+}
+.login-form input {
+	margin: 1em 0;
+}

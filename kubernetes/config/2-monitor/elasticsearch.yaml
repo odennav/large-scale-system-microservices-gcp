@@ -1,0 +1,138 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: monitor
+  labels:
+    app: elasticsearch
+spec:
+  clusterIP: None
+  ports:
+    - port: 9200
+      name: elasticsearch
+    - port: 9114
+      name: prometheus
+  selector:
+    app: elasticsearch
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: elasticsearch-pod
+  namespace: monitor
+  labels:
+    app: elasticsearch
+spec:
+  initContainers:
+    - name: fix-volume-permission
+      image: elasticsearch:7.13.2
+      command: ['/bin/bash', '-c', 'chown -R 1000:1000 /usr/share/elasticsearch/data']
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: elasticsearch-storage
+          mountPath: /usr/share/elasticsearch/data
+  containers:
+    - name: prometheus-es-exporter
+      image: prometheuscommunity/elasticsearch-exporter
+      ports:
+        - protocol: TCP
+          containerPort: 9114
+      args: ["--es.uri=http://elasticsearch:9200"]
+    - name: elasticsearch-cont
+      image: elasticsearch:7.13.2
+      imagePullPolicy: Always
+      ports:
+        - protocol: TCP
+          containerPort: 9200
+      volumeMounts:
+        - mountPath: "/usr/share/elasticsearch/data"
+          name: elasticsearch-storage
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 9200
+        initialDelaySeconds: 180
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 9200
+        initialDelaySeconds: 30
+        periodSeconds: 2
+      env:
+        - name: discovery.type
+          value: "single-node"
+        - name: ES_JAVA_OPTS
+          value: "-Xms512m -Xmx512m"
+        - name: xpack.security.enabled
+          value: "false"
+  volumes:
+    - name: elasticsearch-storage
+      persistentVolumeClaim:
+        claimName: local-disk-elasticsearch-claim
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: local-disk-elasticsearch-claim
+  namespace: monitor
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: monitor
+  labels:
+    app: kibana
+spec:
+  ports:
+    - protocol: TCP
+      port: 5601
+      targetPort: 5601
+      nodePort: 32101
+  selector:
+    app: kibana
+  type: NodePort
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kibana-pod
+  namespace: monitor
+  labels:
+    app: kibana
+spec:
+  initContainers:
+  - name: wait-for-es
+    image: curlimages/curl
+    command: ['sh', '-c', 'until curl http://elasticsearch:9200; do echo Waiting for ES; sleep 2; done;']
+  containers:
+    - name: kibana-cont
+      image: kibana:7.13.2
+      imagePullPolicy: Always
+      ports:
+        - protocol: TCP
+          containerPort: 5601
+      env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elasticsearch:9200"
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 5601
+        initialDelaySeconds: 60
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 5601
+        initialDelaySeconds: 20
+        periodSeconds: 2
