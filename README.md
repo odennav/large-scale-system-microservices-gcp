@@ -335,8 +335,8 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
     ./kube-volumes.sh delete
     ```
 
-    Go to 'Clusters' section in 'Kubernetes Engine' product and delete cluster.
-    Click on Actions ':' menu and select 'Delete'
+   Go to 'Clusters' section in 'Kubernetes Engine' product and delete cluster.
+   Click on Actions ':' menu and select 'Delete'
 
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/38.png)
 
