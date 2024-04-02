@@ -288,9 +288,11 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/24.png)
 
    Please note this option opens ports 32100 and 32105 on all VM instances in your VPC network.
+   
    Effectively, you can select the firewall rules initially created for each of the kubernetes cluster nodes and edit firewall settings by including    Nodeports among TCP ports allowed.
 
    **Access System Components for Centralized Logging, Tracing and Resource Monitoring**
+   
    Add the following Nodeports as TCP ports in firewall rule created above
    - 32101 for Kibana/Elasticsearch 
    
@@ -330,7 +332,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
 ## Special Credits
 
-Special thanks to Anurag Yadav.
+Special thanks to [Anurag Yadav](https://www.newtechways.com/).
 
 
 ### Contributions ###
