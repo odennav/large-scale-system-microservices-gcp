@@ -300,32 +300,30 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    Effectively, you can select the firewall rules initially created for each of the kubernetes cluster nodes and edit firewall settings by including    Nodeports among TCP ports allowed.
 
 
-10.**Access System Components for Centralized Logging, Tracing and Resource Monitoring**
+10. **Access System Components for Centralized Logging, Tracing and Resource Monitoring**
    
-   Add the following Nodeports as TCP ports in firewall rule created above
-   - 32101 for Kibana/Elasticsearch 
+    Add the following Nodeports as TCP ports in firewall rule created above
+    - 32101 for Kibana/Elasticsearch 
    
-   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/30.png)
+    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/30.png)
 
-   - 32102 for Uber Jaeger
+    - 32102 for Uber Jaeger
 
-   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/31.png)
+    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/31.png)
 
-   - 32103 for Prometheus
+    - 32103 for Prometheus
    
-   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/33.png)
+    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/33.png)
 
-   - 32104 for RabbitMQ
+    - 32104 for RabbitMQ
 
-   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/36.png)
+    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/36.png)
 
 
 
-## Shutdown Kubernetes Cluster
-    
+##  Shutdown Kubernetes Cluster
     To remove all resources for kubernetes cluster and stop incurring charges. 
    
-
     ```bash
     cd ~/large-scale-app-micros-gcp/kubernetes
     ./kube-deploy.sh ./config/ delete
