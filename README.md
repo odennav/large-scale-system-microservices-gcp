@@ -321,8 +321,8 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
 
 
-##  Shutdown Kubernetes Cluster
-    To remove all resources for kubernetes cluster and stop incurring charges. 
+## Shutdown Kubernetes Cluster
+   To remove all resources for kubernetes cluster and stop incurring charges. 
    
     ```bash
     cd ~/large-scale-app-micros-gcp/kubernetes
@@ -338,7 +338,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
     Go to 'Clusters' section in 'Kubernetes Engine' product and delete cluster.
     Click on Actions ':' menu and select 'Delete'
 
-    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/38.png)
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/38.png)
 
 
 ## Special Credits
