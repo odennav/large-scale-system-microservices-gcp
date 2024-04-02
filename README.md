@@ -178,7 +178,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/9.png)
 
 
-   Click 'CREATE' at bottom to start process of creating kubernetes cluster
+   Click 'CREATE' at bottom to start process of creating kubernetes cluster.
    Note cluster created with total of 18 vCPUs, 36GB memory and nodes from each zone.
 
 
@@ -299,7 +299,8 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    
    Effectively, you can select the firewall rules initially created for each of the kubernetes cluster nodes and edit firewall settings by including    Nodeports among TCP ports allowed.
 
-   **Access System Components for Centralized Logging, Tracing and Resource Monitoring**
+
+10. **Access System Components for Centralized Logging, Tracing and Resource Monitoring**
    
    Add the following Nodeports as TCP ports in firewall rule created above
    - 32101 for Kibana/Elasticsearch 
@@ -318,7 +319,9 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/36.png)
 
-10. **Shutdown Kubernetes Cluster**
+
+
+## Shutdown Kubernetes Cluster
     
     To remove all resources for kubernetes cluster and stop incurring charges. 
     
