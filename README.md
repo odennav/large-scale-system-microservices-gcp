@@ -17,6 +17,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 ### Getting Started ###
 
 1. **Create a project**
+   
    Choose name of your project.
    
    Involves setting a billing account.
