@@ -300,7 +300,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    Effectively, you can select the firewall rules initially created for each of the kubernetes cluster nodes and edit firewall settings by including    Nodeports among TCP ports allowed.
 
 
-10. **Access System Components for Centralized Logging, Tracing and Resource Monitoring**
+10.**Access System Components for Centralized Logging, Tracing and Resource Monitoring**
    
    Add the following Nodeports as TCP ports in firewall rule created above
    - 32101 for Kibana/Elasticsearch 
@@ -324,7 +324,8 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 ## Shutdown Kubernetes Cluster
     
     To remove all resources for kubernetes cluster and stop incurring charges. 
-    
+   
+
     ```bash
     cd ~/large-scale-app-micros-gcp/kubernetes
     ./kube-deploy.sh ./config/ delete
