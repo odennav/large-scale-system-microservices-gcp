@@ -4,6 +4,9 @@ Deploy a large-scale system utilizing Python Django for the webapp, Java Spring 
 
 Containerization is achieved with Docker containers and Docker Compose, service discovery handled by Netflix Eureka and a gateway provided by NetflixZuul.
 
+
+![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/41.png)
+
 Client-side load balancing is managed using Ribbon, while server-side load balancing is facilitated by Nginx.
 
 Logging is handled by Elasticsearch, Fluent, and Kibana, with tracing supported by Jaeger, and monitoring and alerts provided by Prometheus.
