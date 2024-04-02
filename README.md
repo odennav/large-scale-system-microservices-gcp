@@ -112,7 +112,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ```bash
    docker version
    ```
-   ![](https://github.com/odennav/large-scale-app-micros-gcp/blob/main/4.png)
+   ![](https://github.com/odennav/large-scale-app-micros-gcp/blob/main/snip/deployment-snips/4.png)
 
    Trigger a complete build and build the entire codebase.
    -Building codebase
