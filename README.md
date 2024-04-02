@@ -13,6 +13,10 @@ Caching is managed using Redis, RabbitMQ facilitates asynchronous processing, an
 Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, and rolling upgrades.
 
 
+## Special Credits
+
+Special thanks to Anurag Yadav.
+
 ### Getting Started ###
 
 1. **Create a project**
@@ -112,7 +116,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ```bash
    docker version
    ```
-   ![](https://github.com/odennav/large-scale-app-micros-gcp/blob/main/snip/deployment-snips/4.png)
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/4.png)
 
    Trigger a complete build and build the entire codebase.
    -Building codebase
@@ -130,7 +134,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ```
    During remote authentication to gcloud CLI, you'll be asked to copy link in your browser because Google SDK wants to access your google account.     Allow access, copy authorization code and paste in SSH-in-browser.
 
-
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/2.png)
    It locates all images starting with 'ntw', then tags them before pushing to registry
    Ensure registry zone in script is the same region as your devbuild-1 instance and is also a region in either US, Europe or Asia.
 
@@ -140,33 +144,46 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    cd ~/large-scale-app-micros-gcp/kubernetes
    ./gcp-push-images.sh
    ```
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/5.png)
 
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/6.png)
 
 6. **Create K8s Cluster on Google Cloud**
 
    Go to 'Compute' section and click 'Kubernetes Engine'.
    Enable Kubernetes API
    Click on 'CREATE' under section of Kubernetes clusters.
-   Choose 'GKE Standard' or switch to STANDARD CLUSTER.
-   Name your kubernetes cluster and select 'Regional' for Location type, to have our
-   system in multiple zones within a region. Select same region for devbuild-1 VM instance
+   Choose 'GKE Standard' or switch to 'STANDARD CLUSTER'.
+   Name your kubernetes cluster and select 'Regional' for Location type, to have our system in multiple zones within a region.
+   Select same region for devbuild-1 VM instance
+
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/7.png)
 
    Change number of nodes per zone to 1 in 'Node pool details', so we have 3 machines in different zones.
+   
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/8.png)
+
    For each node in pool,
    - Select E2 machine type
    - 6 vCPU, 2 cores each
    - 12GB memory total
    - Boot disk size of 50GB
    - Enable nodes on spot VMs(reduces monthly cost)
+   
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/9.png)
+
    Click 'CREATE' at bottom to start process of creating kubernetes cluster
 
    Note cluster created with total of 18 vCPUs, 36GB memory and nodes from each zone.
+
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/11.png)
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/10.png)
 
 7. **Kubernetes Environment Configuration for System**
    To host our system on this gcp k8s cluster, we'll have to create k8s config and services.
 
    Install kubectl
-   kubectl enables us to communicate with the kubernetes cluster
+   kubectl enables devbuild-1 VM instance to communicate with the kubernetes cluster
    ```bash
    cd ~/large-scale-app-micros-gcp/kubernetes
    ./gcp-install-kubectl.sh
@@ -176,10 +193,15 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    Locate your cluster created in 'Kubernetes Engine' section on GCP and click on ':'  to view options, then click 'Connect'.
    Copy and paste gcloud command to devbuild-1 terminal.
 
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/12.png)
+
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/13.png) 
+   
    Confirm kubectl has access to nodes in pool
    ```bash
    kubectl get nodes
    ```
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/14.png)
 
    Create namespaces
    ```bash
@@ -217,10 +239,15 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    cd ~/large-scale-app-micros-gcp/kubernetes/volume
    ./kube-volumes.sh
    ```
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/15.png)
+
    Set up all System Workloads on Kubernetes Cluster
-   Identify all config yaml files and create all resources required to start the app on
-   kubernetes cluster
-   Ensure REGISTRY_HOST=eu.gcr.io
+   Identify all config yaml files and create all resources required to start the app on kubernetes cluster
+
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/37.png)
+
+   kube-deploy.sh script creates all services and deployments configured in the yaml files identified.
+   Ensure variable REGISTRY_HOST=eu.gcr.io is set in bash script due to regional setup of clusters and registry 
    ```bash
    cd ~/large-scale-app-micros-gcp/kubernetes
    ./kube-deploy.sh
@@ -228,16 +255,21 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
    Go to 'Workloads' section under 'Kubernetes Engine' and view pods created and running.
 
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/18.png)
+
    Confirm all namespaces have been created
    ```bash
    kubectl get ns
    ```
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/25.png)
 
    Check for webapp and spa services in ui namespace
 
    ```bash
    kubectl get svc -n ui
    ```
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/26.png)
+
 9. **Access both Webapp and SPA**
    Create 'allow-ssh' firewall rule in your vpc network settings.
    Search for 'VPC Network' in Google cloud platform and click on 'Firewall' on left-side bar. Select 'CREATE FIREWALL RULE'.
@@ -245,14 +277,37 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    - Direction of traffic is 'Ingress'
    - Use '0.0.0.0/0' as source of IPv4 ranges
    - Under section for 'Protocol and ports' select 'TCP' and insert Nodeports configured for both webapp and spa, 32100 and 32105.
+   
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/28.png)
+
    - Click on 'CREATE' at bottom to create VPC firewall rule.
 
+   Access Login page from your browser on local machine.
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/24.png)
 
    Please note this option opens ports 32100 and 32105 on all VM instances in your VPC network.
    Effectively, you can select the firewall rules initially created for each of the kubernetes cluster nodes and edit firewall settings by including    Nodeports among TCP ports allowed.
 
+   **Access System Components for Centralized Logging, Tracing and Resource Monitoring**
+   Add the following Nodeports as TCP ports in firewall rule created above
+   - 32101 for Kibana/Elasticsearch 
+   
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/30.png)
+
+   - 32102 for Uber Jaeger
+
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/31.png)
+
+   - 32103 for Prometheus
+   
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/33.png)
+
+   - 32104 for RabbitMQ
+
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/36.png)
+
 10. **Shutdown Kubernetes Cluster**
-    To remove and delete all resources for kubernetes cluster
+    To remove all resources for kubernetes cluster and stop incurring charges. 
     
     ```bash
     cd ~/large-scale-app-micros-gcp/kubernetes
@@ -267,6 +322,8 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
     Go to 'Clusters' section in 'Kubernetes Engine' product and delete cluster.
     Click on Actions ':' menu and select 'Delete'
+
+    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/38.png)
 
 ### Contributions ###
 
