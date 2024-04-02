@@ -13,9 +13,6 @@ Caching is managed using Redis, RabbitMQ facilitates asynchronous processing, an
 Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, and rolling upgrades.
 
 
-## Special Credits
-
-Special thanks to Anurag Yadav.
 
 ### Getting Started ###
 
@@ -324,6 +321,12 @@ Special thanks to Anurag Yadav.
     Click on Actions ':' menu and select 'Delete'
 
     ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/38.png)
+
+
+## Special Credits
+
+Special thanks to Anurag Yadav.
+
 
 ### Contributions ###
 
