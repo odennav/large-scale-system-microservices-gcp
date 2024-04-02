@@ -28,13 +28,17 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
    Select Machine type 
    - 4 vCPUs, 2 core, 16 GB memory
+   
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/39.png)
 
    Change availability policies to 'Spot' VM provisioning model.
    This reduces monthly estimate cost by more than 50%
 
-   Each instance requires a disk to boot from. Select an image to create a new boot disk or  
-   attach an existing disk to the instance. Then select 'Create' at bottom to provision new 
-   VM instance.
+   Each instance requires a disk to boot from. Select an image to create a new boot disk or attach an existing disk to the instance.
+   
+   ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/40.png)
+
+   Then select 'Create' at bottom to provision new VM instance.
    Note the External IP assigned.
 
 
