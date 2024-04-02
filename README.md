@@ -27,6 +27,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
    Search for 'Compute Engine' and select 'Create Instance'
    Enter name of VM instance, select Region, Zone and Machine Configuration(Low cost, day-to-day computing).
+   
    Select Machine type 
    - 4 vCPUs, 2 core, 16 GB memory
    
@@ -44,6 +45,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
 
 2. **Create a New User on VM Instance**
+   
    Click on 'SSH' and allow SSH-in-browser to connect to devbuild-1 VM
    Second option for SSH connection as shown [here](https://www.youtube.com/watch?v=fmh94mNQHQc):
    
@@ -84,7 +86,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    chmod 0440 odennav-admin
     ```
 
-3. **Confirm git is installed**
+3. **Confirm Git is installed**
    ```bash
    git version
    ```
@@ -129,6 +131,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ```
 
 5. **Setup Container Registry and Push images to Google Cloud Registry**
+   
    Before we can upload created images to google cloud registry, we have to authorize host docker in devbuild-1 VM instance.
    ```bash
    cd ~/large-scale-app-micros-gcp/bin
@@ -174,14 +177,17 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/9.png)
 
-   Click 'CREATE' at bottom to start process of creating kubernetes cluster
 
+   Click 'CREATE' at bottom to start process of creating kubernetes cluster
    Note cluster created with total of 18 vCPUs, 36GB memory and nodes from each zone.
+
 
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/11.png)
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/10.png)
 
+
 7. **Kubernetes Environment Configuration for System**
+   
    To host our system on this gcp k8s cluster, we'll have to create k8s config and services.
 
    Install kubectl
@@ -235,6 +241,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
 
 8. **Kubernetes Volume Configuration**
+   
    Configure persistent volumes for each node in node pool
 
    ```bash
@@ -273,6 +280,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/26.png)
 
 9. **Access both Webapp and SPA**
+   
    Create 'allow-ssh' firewall rule in your vpc network settings.
    Search for 'VPC Network' in Google cloud platform and click on 'Firewall' on left-side bar. Select 'CREATE FIREWALL RULE'.
    - Enter name of firewall rule - 'allow-sys'
@@ -311,6 +319,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/36.png)
 
 10. **Shutdown Kubernetes Cluster**
+    
     To remove all resources for kubernetes cluster and stop incurring charges. 
     
     ```bash
@@ -339,3 +348,5 @@ Special thanks to [Anurag Yadav](https://www.newtechways.com/).
 
 * Writing tests
 * Code review
+
+Enjoy!
