@@ -104,6 +104,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ```bash
    git clone https://github.com/odennav/large-scale-app-micros-gcp.git
    ```
+
 4. **Complete Image Build of System Components**
    
    Enable execution of all bash scripts in large-scale-app-micros-gcp/ directory
@@ -131,6 +132,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ```bash
    ./build-system.sh
    ```
+
 
 5. **Setup Container Registry and Push images to Google Cloud Registry**
    
@@ -165,13 +167,14 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    Select same region for devbuild-1 VM instance
 
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/7.png)
-
+-----
    
    **Change number of nodes per zone to 1 in 'Node pool details', so we have 3 machines in different zones.**
    
    
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/8.png)
 
+-----
    **For each node in pool:**
    - Select E2 machine type
    - 6 vCPU, 2 cores each
@@ -182,7 +185,10 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/9.png)
 
 
-   Click 'CREATE' at bottom to start process of creating kubernetes cluster.
+
+-----
+   **Click 'CREATE' at bottom to start process of creating kubernetes cluster.**
+
    Note cluster created with total of 18 vCPUs, 36GB memory and nodes from each zone.
 
 
@@ -190,6 +196,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/10.png)
 
 
+-----
 
 7. **Kubernetes Environment Configuration for System**
    
@@ -214,6 +221,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/13.png) 
    
 
+-----
 
    Confirm kubectl has access to nodes in pool
    ```bash
@@ -268,7 +276,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/37.png)
 
    kube-deploy.sh script creates all services and deployments configured in the yaml files identified.
-   Ensure variable REGISTRY_HOST=eu.gcr.io is set in bash script due to regional setup of clusters and registry 
+   Ensure variable **REGISTRY_HOST**=eu.gcr.io is set in bash script due to regional setup of clusters and registry 
    ```bash
    cd ~/large-scale-app-micros-gcp/kubernetes
    ./kube-deploy.sh
@@ -315,7 +323,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 10. **Access System Components for Centralized Logging, Tracing and Resource Monitoring**
    
     Add the following Nodeports as TCP ports in firewall rule created above
-    - 32101 for Kibana/Elasticsearch 
+    - **32101 for Kibana/Elasticsearch** 
    
     ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/30.png)
 
