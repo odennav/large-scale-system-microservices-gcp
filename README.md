@@ -19,19 +19,20 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
 ### Getting Started ###
 
-1. **Create a project**
+1. **Create New Project**
    
    Choose name of your project.
-   Involves setting a billing account.
-   You can use 90-day trial to help cover costs of resources for this project.
+   Confirm your billing account or use 90-day trial to help cover costs of resources for this project.
 
-   Search for 'Compute Engine' and select 'Create Instance'
+   Search for 'Compute Engine' and select 'CREATE INSTANCE'.
+
    Enter name of VM instance, select Region, Zone and Machine Configuration(Low cost, day-to-day computing).
    
-   Select Machine type 
+   **Select Machine type** 
    - 4 vCPUs, 2 core, 16 GB memory
    
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/39.png)
+
 
    Change availability policies to 'Spot' VM provisioning model.
    This reduces monthly estimate cost by more than 50%
@@ -40,7 +41,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/40.png)
 
-   Then select 'Create' at bottom to provision new VM instance.
+   Then select 'CREATE' at bottom to provision new VM instance.
    Note the External IP assigned.
 
 
@@ -143,7 +144,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    It locates all images starting with 'ntw', then tags them before pushing to registry
    Ensure registry zone in script is the same region as your devbuild-1 instance and is also a region in either US, Europe or Asia.
 
-   REGISTRY_HOST=eu.gcr.io due to VM instance and Kubernetes cluster provisioned in European region.
+   **REGISTRY_HOST**=eu.gcr.io due to VM instance and Kubernetes cluster provisioned in European region.
 
    ```bash
    cd ~/large-scale-app-micros-gcp/kubernetes
@@ -153,7 +154,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/6.png)
 
-6. **Create K8s Cluster on Google Cloud**
+6. **Create Kubernetes Cluster on Google Cloud**
 
    Go to 'Compute' section and click 'Kubernetes Engine'.
    Enable Kubernetes API
@@ -164,11 +165,13 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/7.png)
 
-   Change number of nodes per zone to 1 in 'Node pool details', so we have 3 machines in different zones.
+   
+   **Change number of nodes per zone to 1 in 'Node pool details', so we have 3 machines in different zones.**
+   
    
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/8.png)
 
-   For each node in pool,
+   **For each node in pool:**
    - Select E2 machine type
    - 6 vCPU, 2 cores each
    - 12GB memory total
@@ -186,6 +189,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/10.png)
 
 
+
 7. **Kubernetes Environment Configuration for System**
    
    To host our system on this gcp k8s cluster, we'll have to create k8s config and services.
@@ -197,7 +201,10 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    ./gcp-install-kubectl.sh
    ```
 
-   Configure kubectl command line access to k8s cluster
+
+
+   **Configure kubectl command line access to k8s cluster**
+
    Locate your cluster created in 'Kubernetes Engine' section on GCP and click on ':'  to view options, then click 'Connect'.
    Copy and paste gcloud command to devbuild-1 terminal.
 
@@ -205,11 +212,15 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/13.png) 
    
+
+
    Confirm kubectl has access to nodes in pool
    ```bash
    kubectl get nodes
    ```
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/14.png)
+
+   
 
    Create namespaces
    ```bash
@@ -290,7 +301,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/28.png)
 
-   - Click on 'CREATE' at bottom to create VPC firewall rule.
+   - **Click on 'CREATE' at bottom to create VPC firewall rule.**
 
    Access Login page from your browser on local machine.
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/24.png)
@@ -307,15 +318,15 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
    
     ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/30.png)
 
-    - 32102 for Uber Jaeger
+    - **32102 for Uber Jaeger**
 
     ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/31.png)
 
-    - 32103 for Prometheus
+    - **32103 for Prometheus**
    
     ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/33.png)
 
-    - 32104 for RabbitMQ
+    - **32104 for RabbitMQ**
 
     ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/snip/deployment-snips/36.png)
 
@@ -344,6 +355,7 @@ Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, an
 ## Special Credits
 
 Special thanks to [Anurag Yadav](https://www.newtechways.com/).
+
 
 
 ### Contributions ###
