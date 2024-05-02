@@ -1,8 +1,8 @@
 
 ### Deployment of Large Scale System with Kubernetes on Google Cloud ###
-Deploy a large-scale system utilizing Python Django for the Webapp, Java Spring Boot for the RESTful service, PostgreSQL and Cassandra for the database, ReactJS for the SPA(Single Page Application).
+Deploy a large-scale system that utilizes Python Django for the Webapp, Java Spring Boot for the RESTful services, PostgreSQL and Cassandra for the database, ReactJS for the SPA(Single Page Application).
 
-Containerization is achieved with Docker containers and Docker Compose, service discovery handled by Netflix Eureka and a gateway provided by NetflixZuul.
+Containerization is achieved with Docker containers and Docker compose, Service discovery handled by Netflix Eureka and a gateway provided by NetflixZuul.
 
 
 ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/41.PNG)
@@ -13,7 +13,7 @@ Logging is handled by Elasticsearch, Fluent, and Kibana, with tracing supported 
 
 Caching is managed using Redis, RabbitMQ facilitates asynchronous processing, and Cassandra handles horizontal data partitioning.
 
-Deployment is on Kubernetes on GCP, enabling auto-scaling, high availability, and rolling upgrades.
+Deployment is on Google cloud kubernetes engine, enabling auto-scaling, high availability, and rolling upgrades.
 
 
 
