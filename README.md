@@ -1,19 +1,19 @@
 
 ### Deployment of Large Scale System with Kubernetes on Google Cloud ###
-Deploy a large-scale system that utilizes Python Django for the Webapp, Java Spring Boot for the RESTful services, PostgreSQL and Cassandra for the database, ReactJS for the SPA(Single Page Application).
+Deploy a Large-scale system that utilizes Python Django for the Webapp, Java Spring Boot for the RESTful services, PostgreSQL and Cassandra for the database, ReactJS for the SPA(Single Page Application).
 
-Containerization is achieved with Docker containers and Docker compose, Service discovery handled by Netflix Eureka and a gateway provided by NetflixZuul.
+Containerization is achieved with Docker containers and Docker-compose, Service discovery handled by Netflix-Eureka and Gateway provided by Netflix-Zuul.
 
 
 ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/41.PNG)
 
-Client-side load balancing is managed using Ribbon, while server-side load balancing is facilitated by Nginx.
+Client-side load balancing is managed using Ribbon, while Server-side load balancing is facilitated by Nginx.
 
-Logging is handled by Elasticsearch, Fluent, and Kibana, with tracing supported by Uber Jaeger, and monitoring and alerts provided by Prometheus.
+Logging is handled by Elasticsearch, Fluent, and Kibana, with tracing supported by Uber Jaeger, and Monitoring and alerts are provided by Prometheus.
 
 Caching is managed using Redis, RabbitMQ facilitates asynchronous processing, and Cassandra handles horizontal data partitioning.
 
-Deployment is on Google cloud kubernetes engine, enabling auto-scaling, high availability, and rolling upgrades.
+Deployment is on Google Cloud kubernetes engine, enabling Auto-scaling, High availability, and Rolling upgrades.
 
 
 
@@ -30,6 +30,7 @@ Deployment is on Google cloud kubernetes engine, enabling auto-scaling, high ava
    Enter name of VM instance, select Region, Zone and Machine Configuration(Low cost, day-to-day computing).
    
    **Select Machine type** 
+
    - 4 vCPUs, 2 core, 16 GB memory
    
    ![](https://github.com/odennav/large-scale-system-micros-gcp/blob/main/docs/39.png)
